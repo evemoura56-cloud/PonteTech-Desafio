@@ -2,7 +2,20 @@ import axios, { AxiosInstance } from "axios";
 import { useMemo } from "react";
 import type { AuthPayload, AuthResponse, Task, TaskForm, DashboardSummary } from "../types";
 
-const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const resolveBaseURL = (): string => {
+  const fromEnv = import.meta.env.VITE_API_URL;
+  if (fromEnv) {
+    return fromEnv;
+  }
+  if (typeof window !== "undefined") {
+    const protocol = window.location.protocol.includes("https") ? "https" : "http";
+    const hostname = window.location.hostname || "localhost";
+    return `${protocol}://${hostname}:8000`;
+  }
+  return "http://localhost:8000";
+};
+
+const baseURL = resolveBaseURL();
 
 export const useApi = (token: string | null) => {
   const authenticatedClient = useMemo<AxiosInstance>(() => {
