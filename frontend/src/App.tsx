@@ -4,6 +4,7 @@ import type { AuthPayload, DashboardSummary, Task, TaskForm } from "./types";
 import LoginPanel from "./components/LoginPanel";
 import TaskBoard from "./components/TaskBoard";
 import DashboardSummaryCard from "./components/DashboardSummary";
+import { NORMALIZE_STATUS, STATUS_CONFIG } from "./constants/status";
 
 const App = () => {
   const [token, setToken] = useState<string | null>(null);
@@ -11,6 +12,16 @@ const App = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [favoriteIds, setFavoriteIds] = useState<number[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = window.localStorage.getItem("ponte:favorites");
+      return stored ? (JSON.parse(stored) as number[]) : [];
+    } catch {
+      return [];
+    }
+  });
   const api = useApi(token);
 
   useEffect(() => {
@@ -40,6 +51,35 @@ const App = () => {
     setUserName(session.user.full_name);
   };
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("ponte:favorites", JSON.stringify(favoriteIds));
+  }, [favoriteIds]);
+
+  const normalizedTasks = useMemo(
+    () => tasks.map((task) => ({ ...task, status: NORMALIZE_STATUS(task.status) })),
+    [tasks]
+  );
+
+  const favoriteSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
+
+  const filteredTasks = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    return normalizedTasks
+      .filter((task) => (term ? task.title.toLowerCase().includes(term) : true))
+      .sort((a, b) => Number(favoriteSet.has(b.id)) - Number(favoriteSet.has(a.id)));
+  }, [favoriteSet, normalizedTasks, searchTerm]);
+
+  const statusBreakdown = useMemo(
+    () =>
+      STATUS_CONFIG.map((config) => ({
+        label: config.label,
+        color: config.color,
+        value: normalizedTasks.filter((task) => task.status === config.value).length
+      })),
+    [normalizedTasks]
+  );
+
   const handleCreateTask = async (payload: TaskForm) => {
     const formatted = {
       ...payload,
@@ -66,6 +106,12 @@ const App = () => {
     setSummary(refreshed);
   };
 
+  const toggleFavorite = (taskId: number) => {
+    setFavoriteIds((prev) =>
+      prev.includes(taskId) ? prev.filter((id) => id !== taskId) : [...prev, taskId]
+    );
+  };
+
   const backgroundGrid = useMemo(() => Array.from({ length: 24 }, (_, index) => <span key={index} />), []);
 
   return (
@@ -77,14 +123,23 @@ const App = () => {
         <section className="stack gap-lg">
           <header>
             <p className="eyebrow">Bem-vindo(a)</p>
-            <h1 className="hero">Ola, {userName.split(" ")[0]}</h1>
-            <p className="muted">Sincronize squads, elimine ruidos e avance com clareza.</p>
+            <h1 className="hero">Olá, {userName.split(" ")[0]}</h1>
+            <p className="muted">Sincronize squads, elimine ruídos e avance com clareza.</p>
             <button className="ghost" onClick={() => setToken(null)}>
-              Encerrar sessao
+              Encerrar sessão
             </button>
           </header>
-          <DashboardSummaryCard summary={summary} />
-          <TaskBoard tasks={tasks} onCreate={handleCreateTask} onToggle={handleToggleTask} onDelete={handleDeleteTask} />
+          <DashboardSummaryCard summary={summary} statusBreakdown={statusBreakdown} />
+          <TaskBoard
+            tasks={filteredTasks}
+            onCreate={handleCreateTask}
+            onToggle={handleToggleTask}
+            onDelete={handleDeleteTask}
+            onToggleFavorite={toggleFavorite}
+            favorites={favoriteSet}
+            searchTerm={searchTerm}
+            onSearch={setSearchTerm}
+          />
           {loading && <p className="muted">Atualizando telemetria...</p>}
         </section>
       )}

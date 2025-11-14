@@ -17,11 +17,13 @@ export type AuthResponse = {
   user: UserProfile;
 };
 
+export type StatusValue = "backlog" | "in_progress" | "done";
+
 export type Task = {
   id: number;
   title: string;
   description?: string | null;
-  status: string;
+  status: StatusValue;
   priority: string;
   due_date?: string | null;
   created_at: string;
@@ -31,7 +33,7 @@ export type Task = {
 export type TaskForm = {
   title: string;
   description?: string;
-  status: string;
+  status: StatusValue;
   priority: string;
   due_date?: string;
 };

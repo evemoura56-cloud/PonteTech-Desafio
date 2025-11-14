@@ -29,7 +29,7 @@ export const LoginPanel = ({ onLogin, onRegister }: Props) => {
         await onRegister(form);
       }
       setForm(initialState);
-    } catch (err) {
+    } catch {
       setError("Não foi possível autenticar. Revise os dados e tente novamente.");
     } finally {
       setLoading(false);
@@ -40,8 +40,8 @@ export const LoginPanel = ({ onLogin, onRegister }: Props) => {
     <section className="card glass">
       <header>
         <p className="eyebrow">PonteTech</p>
-        <h1>{mode === "login" ? "Bem-vindo ao Mission Control" : "Criar nova credencial"}</h1>
-        <p>Gerencie squads, crie fluxos e acompanhe seus pilotos usando uma interface futurista.</p>
+        <h1>{mode === "login" ? "Bem-vindo(a) ao seu painel de produtividade" : "Criar nova credencial"}</h1>
+        <p>Organize tarefas, acompanhe seu progresso e avance com clareza.</p>
       </header>
       <form onSubmit={handleSubmit} className="stack gap-md">
         {mode === "register" && (
@@ -70,13 +70,14 @@ export const LoginPanel = ({ onLogin, onRegister }: Props) => {
             type="password"
             required
             minLength={8}
+            autoComplete={mode === "login" ? "current-password" : "new-password"}
             value={form.password}
             onChange={(event) => setForm((prev) => ({ ...prev, password: event.target.value }))}
           />
         </label>
         {error && <p className="error">{error}</p>}
         <button type="submit" className="primary" disabled={loading}>
-          {loading ? "Sincronizando..." : mode === "login" ? "Entrar no painel" : "Registrar tripulante"}
+          {loading ? "Sincronizando..." : mode === "login" ? "Entrar no painel" : "Criar acesso"}
         </button>
       </form>
       <footer>
