@@ -30,27 +30,26 @@ O frontend foi organizado em componentes, hooks e chamadas isoladas para a API.
 
 PonteTech-Desafio/
 ├── backend/
-│ ├── alembic/
-│ ├── app/
-│ │ ├── api/
-│ │ ├── core/
-│ │ ├── db/
-│ │ ├── models/
-│ │ ├── schemas/
-│ │ ├── services/
-│ │ ├── seeds/
-│ │ └── utils/
-│ ├── requirements.txt
-│ └── tests/
+│   ├── alembic/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── db/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   ├── seeds/
+│   │   └── utils/
+│   ├── requirements.txt
+│   └── tests/
 ├── frontend/
-│ ├── src/
-│ │ ├── components/
-│ │ ├── hooks/
-│ │ ├── constants/
-│ │ └── styles.css
-│ └── package.json
+│   ├── src/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── constants/
+│   │   └── styles.css
+│   └── package.json
 └── docker-compose.yml
-
 
 ## Autenticação
 
