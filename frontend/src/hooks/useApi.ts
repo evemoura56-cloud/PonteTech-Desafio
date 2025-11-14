@@ -3,16 +3,25 @@ import { useMemo } from "react";
 import type { AuthPayload, AuthResponse, Task, TaskForm, DashboardSummary } from "../types";
 
 const resolveBaseURL = (): string => {
+  const fallbackProtocol = typeof window !== "undefined" && window.location.protocol.includes("https") ? "https" : "http";
+  const fallbackHost = typeof window !== "undefined" ? window.location.hostname || "localhost" : "localhost";
+  const fallbackPort = 8000;
+
   const fromEnv = import.meta.env.VITE_API_URL;
   if (fromEnv) {
-    return fromEnv;
+    try {
+      const parsed = new URL(fromEnv);
+      if (parsed.hostname === "backend" || parsed.hostname === "0.0.0.0" || parsed.hostname === "") {
+        const portSegment = parsed.port || String(fallbackPort);
+        return `${fallbackProtocol}://${fallbackHost}:${portSegment}`;
+      }
+      return parsed.toString();
+    } catch {
+      return fromEnv;
+    }
   }
-  if (typeof window !== "undefined") {
-    const protocol = window.location.protocol.includes("https") ? "https" : "http";
-    const hostname = window.location.hostname || "localhost";
-    return `${protocol}://${hostname}:8000`;
-  }
-  return "http://localhost:8000";
+
+  return `${fallbackProtocol}://${fallbackHost}:${fallbackPort}`;
 };
 
 const baseURL = resolveBaseURL();
