@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ponte-tech-backend"
+version = "0.1.0"
+description = "Backend FastAPI para o desafio PonteTech"
+authors = [{ name = "PonteTech Squad" }]
+readme = "../README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.104.1,<0.110.0",
+  "uvicorn[standard]>=0.23.2,<0.27.0",
+  "SQLAlchemy>=2.0.20,<2.1",
+  "psycopg[binary]>=3.1.12,<3.2",
+  "alembic>=1.12.1,<1.13",
+  "PyJWT>=2.8.0,<3.0",
+  "bcrypt>=4.0.1,<5.0",
+  "structlog>=23.1.0,<24.0",
+  "pydantic>=2.4.2,<3.0",
+  "pydantic-settings>=2.0.3,<3.0",
+  "python-multipart>=0.0.6,<0.1",
+  "email-validator>=2.0.0,<3.0",
+  "Faker>=19.3.1,<20.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.4.2,<8.0",
+  "pytest-cov>=4.1.0,<5.0",
+  "httpx>=0.25.0,<0.26.0"
+]
+
+[tool.pytest.ini_options]
+addopts = "-q --disable-warnings --maxfail=1"
+testpaths = ["tests"]
